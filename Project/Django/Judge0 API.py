@@ -1,4 +1,4 @@
-import requests, json
+import requests, json, base64
 from os import system
 
 testcases = {
@@ -7,6 +7,7 @@ testcases = {
     2: {'stdin': '300000\n100000\n', 'expected_output': '400000', 'description': 'comment_result'},
     3: {'stdin': '600\n100000\n', 'expected_output': '10060', 'description': 'comment_result'}
 }
+
 
 languages = [
   {"id": 1,"name": "Bash (4.4)"},
@@ -76,13 +77,13 @@ lang_choice = input('Choose amoung following languages: ')
 system('clear')
 print('SUM OF TWO INTEGERS: Take 2 integers as input and print their sum.')
 print('Enter your code:-')
-with open('/Users/pranavjain/Github/Python/Sample.txt', 'w') as f:
+with open('Sample.txt', 'w') as f:
     while True:
         s = input()
         if s == '': break
         f.write(s)
         f.write('\n')
-with open('/Users/pranavjain/Github/Python/Sample.txt', 'r') as f:
+with open('Sample.txt', 'r') as f:
     data_s = f.read()
 data["source_code"] = str(data_s)
 data["language_id"] = str(lang_choice)
@@ -97,14 +98,18 @@ for x in range(1, 4):
     print(f'\nTestcase {x}')
     print('Processing...')
     while True:
-        rg = requests.get('https://api.judge0.com/submissions/' + token['token'])
+        rg = requests.get('https://api.judge0.com/submissions/' + token['token'] + '?base64_encoded=true')
+        print(rg)
+        #print(rg.status_code)
         rg = rg.json()
+        #print(base64.b64decode(rg['stderr']))
         if rg['time'] != None: break
     #system('clear')
     print(':stdin:')
     print(testcases[x]['stdin'])
     print('OUTPUT: ', end = '')
-    print(rg['stdout'])
+    print(base64.b64decode(rg['stdout']))
+    #print(base64.b64decode(rg['stderr']))
     print(rg)
     if rg['status']['description'] == 'Accepted': print('Success')
     else:
